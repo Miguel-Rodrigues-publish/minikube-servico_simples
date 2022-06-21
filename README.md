@@ -7,6 +7,7 @@ Um serviço muito simples que espera uma ligação numa porta de TCP e responde 
 * make  (para simplificar o uso)
 * Python3 ( testado com python 3.8)
 * pylint para análise estática do código
+* git
 
 # Teste
 
