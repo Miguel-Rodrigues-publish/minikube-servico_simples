@@ -13,7 +13,7 @@ endif
 
 
 
-lint_minimo = 9						# minimo valor se score do pylint
+lint_minimo = 10						# minimo valor se score do pylint
 
 
 .PHONY : venv

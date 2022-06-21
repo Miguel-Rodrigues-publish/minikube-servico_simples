@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
+# do not generate warning on unused variables
+# pylint: disable= W0612
 
 #
 # imprime o **hostname**  e a data hora em UTC
