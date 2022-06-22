@@ -7,13 +7,13 @@
 # Valores Globais (Empresa)
 ################################################################################
 # minimo valor se score do pylint (static code analyser)
-lint_minimo   = 10
+lint_minimo      := $(shell cat etc/configuracao_empresa/minimo_lint_python.txt)
 # versao de python
-versao_python := $(shell cat etc/versao_python.txt)
+versao_python    := $(shell cat etc/configuracao_empresa/versao_python.txt)
 # versao do container
-versao_container := $(shell cat etc/versao_base_container.txt)
+versao_container := $(shell cat etc/configuracao_empresa/versao_base_container.txt)
 # nome do container
-nome_container := $(shell cat etc/nome_container.txt)
+nome_container   := $(shell cat etc/configuracao_empresa/nome_container.txt)
 
 
 ################################################################################
@@ -22,7 +22,8 @@ nome_container := $(shell cat etc/nome_container.txt)
 # nome do container
 nome_servico = "servico1"
 # versao para marcar o container
-versao = "0.6"
+#versao = "0.6"
+versao := $(shell cat etc/versao_servico.txt)
 
 #
 # teste se python com a versao mínima está presente
