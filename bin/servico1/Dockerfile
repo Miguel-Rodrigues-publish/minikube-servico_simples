@@ -1,20 +1,10 @@
-#FROM debian:latest
-#RUN apt-get update
-#RUN apt-get install -y  python3.9
-#RUN apt-get install -y python3-pip
+# imagem alpine
+ARG  VERSAO_BASE_CONTAINER
+ARG  NOME_BASE_CONTAINER
+FROM ${NOME_BASE_CONTAINER}:${VERSAO_BASE_CONTAINER}
 
-#
-# Debug network debian
-#RUN apt-get install  -y inetutils-ping
-#RUN apt-get install  -y iproute2
-#RUN apt-get install  -y bind9-dnsutils
-#RUN apt-get install  -y procps
-#RUN apt-get install  -y curl
-
-
-# alpine image com minikube em virtualbox falta DNS
-FROM alpine:3.15.4
-RUN apk add python3
+ARG VERSAO_PYTHON      # que versão de python usar
+RUN apk add python3=~$VERSAO_PYTHON
 RUN apk add py3-pip
 RUN apk add bash
 

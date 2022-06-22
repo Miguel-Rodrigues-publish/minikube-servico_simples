@@ -9,6 +9,7 @@ Um serviço muito simples que espera uma ligação numa porta de TCP e responde 
 * pylint para análise estática do código
 * which
 * git
+* kubectl
 
 # Instalação
 ```bash

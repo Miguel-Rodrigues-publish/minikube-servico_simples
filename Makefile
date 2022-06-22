@@ -1,9 +1,28 @@
 
-#
+################################################################################
 # Variaveis globais da Makefile
-#
-lint_minimo = 10						# minimo valor se score do pylint (static code analyser)
-versao_minima_python = 3.8    # versao minima de python para projecto
+################################################################################
+
+################################################################################
+# Valores Globais (Empresa)
+################################################################################
+# minimo valor se score do pylint (static code analyser)
+lint_minimo   = 10
+# versao de python
+versao_python := $(shell cat etc/versao_python.txt)
+# versao do container
+versao_container := $(shell cat etc/versao_base_container.txt)
+# nome do container
+nome_container := $(shell cat etc/nome_container.txt)
+
+
+################################################################################
+# Valores Globais (Projecto)
+################################################################################
+# nome do container
+nome_servico = "servico1"
+# versao para marcar o container
+versao = "0.6"
 
 #
 # teste se python com a versao mínima está presente
@@ -14,10 +33,10 @@ endif
 
 PYTHON_VERSION=$(shell python -c 'import sys; print("%d.%d"% sys.version_info[0:2])' )
 PYTHON_VERSION_OK=$(shell python -c 'import sys;\
-  print(int(float("%d.%d"% sys.version_info[0:2]) >= $(versao_minima_python)))' )
+  print(int(float("%d.%d"% sys.version_info[0:2]) == $(versao_python)))' )
 
 ifeq ($(PYTHON_VERSION_OK),0)
-  $(error "É necessária versão python $(PYTHON_VERSION) >= $(versao_minima_python)")
+  $(error "É necessária versão python $(PYTHON_VERSION) == $(versao_python)")
 endif
 
 #
@@ -63,3 +82,26 @@ lint: install
 teste_servico: teste_python
 	. venv/bin/activate ; \
 	PORTO=9000 NOME=nome_para_testar_servico1 ./bin/servico1/teste.sh
+
+################################################################################
+# Docker
+#		Estes passos só estrão disponíveis se o minikube estiver instalado
+################################################################################
+
+#
+# minikube activo
+#
+.PHONY : minikube
+minikube:
+	minikube start --driver="virtualbox" ;\ #--host-dns-resolver=true --dns-proxy=false;\
+	eval $$(minikube docker-env)
+
+.PHONY : imagem
+imagem: minikube
+	cd ./bin/servico1;\
+	docker build \
+	  --build-arg VERSAO_PYTHON=$(versao_python) \
+	  --build-arg VERSAO_BASE_CONTAINER=$(versao_container) \
+	  --build-arg NOME_BASE_CONTAINER=$(nome_container) \
+		--tag $(nome_servico):$(versao) \
+		.
