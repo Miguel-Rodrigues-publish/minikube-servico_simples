@@ -3,7 +3,7 @@
 Um serviço muito simples que espera uma ligação numa porta de TCP e responde a um pedido GET com uma mensagem.
 # Requisitos
 
-* ambiente Linux
+* ambiente Linux (testado em Ubuntu 20.04 LTS)
 * make  (para simplificar o uso)
 * Python3 ( testado com python 3.8)
 * pylint para análise estática do código
@@ -18,8 +18,16 @@ Um serviço muito simples que espera uma ligação numa porta de TCP e responde 
 ```
 
 
-# Teste
+# Teste local
 
 ```bash
   make
+```
+
+
+# Imagem
+
+## Criação Imagem
+```bash
+  make imagem
 ```
