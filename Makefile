@@ -20,10 +20,20 @@ nome_container   := $(shell cat etc/configuracao_empresa/nome_container.txt)
 # Valores Globais (Projecto)
 ################################################################################
 # nome do container
-nome_servico = "servico1"
+nome_container = servico1
 # versao para marcar o container
 #versao = "0.6"
 versao := $(shell cat etc/versao_servico.txt)
+# porto que o container usa
+porto_teste_container := 3000
+# porto para ligação no "portatil". Não pode estar a ser usado
+porto_teste_local := 4567
+# nome do servico
+nome_servico = nome_para_testar_servico1
+
+################################################################################
+#  Inicio Makefile
+################################################################################
 
 #
 # teste se python com a versao mínima está presente
@@ -82,7 +92,7 @@ lint: install
 .PHONY : teste_servico
 teste_servico: teste_python
 	. venv/bin/activate ; \
-	PORTO=9000 NOME=nome_para_testar_servico1 ./bin/servico1/teste.sh
+	PORTO=$(porto_teste_local) NOME=$(nome_servico) ./bin/servico1/teste.sh
 
 ################################################################################
 # Docker
@@ -104,5 +114,19 @@ imagem: minikube
 	  --build-arg VERSAO_PYTHON=$(versao_python) \
 	  --build-arg VERSAO_BASE_CONTAINER=$(versao_container) \
 	  --build-arg NOME_BASE_CONTAINER=$(nome_container) \
-		--tag $(nome_servico):$(versao) \
+		--tag $(nome_container):$(versao) \
+		--tag latest \
 		.
+
+
+teste_imagem: imagem
+	docker run -env PORTO=$(porto_teste_container) NOME=$(nome_servico) --detach -p $(porto_teste_local):$(porto_teste_container) $(nome_container):$(versao) ;\
+	CONTAINER=$$(docker ps -q --filter=ancestor=$(nome_container):$(versao)) ;\
+	sleep 5 ;\
+	curl localhost:$(porto_teste_local) ;\
+	echo $$CONTAINER ;\
+	docker stop $$CONTAINER
+
+
+
+# storage-provisioner, registry, default-storageclass

@@ -10,6 +10,7 @@ Um serviço muito simples que espera uma ligação numa porta de TCP e responde 
 * which
 * git
 * kubectl
+* curl
 
 # Instalação
 ```bash
@@ -30,4 +31,9 @@ Um serviço muito simples que espera uma ligação numa porta de TCP e responde 
 ## Criação Imagem
 ```bash
   make imagem
+```
+
+## Teste Imagem
+```bash
+  make teste_imagem
 ```
