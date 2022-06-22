@@ -10,8 +10,15 @@ Um serviço muito simples que espera uma ligação numa porta de TCP e responde 
 * which
 * git
 
+# Instalação
+```bash
+  git clone https://github.com/Miguel-Rodrigues-publish/minikube-servico_simples.git
+  cd minikube-servico_simples/
+``
+
+
 # Teste
 
 ```bash
-  make teste_servico
+  make 
 ```
