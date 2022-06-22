@@ -1,4 +1,6 @@
 #
+# pacotes de python necessários
+#
 argparse
 flask
 flask-restful
