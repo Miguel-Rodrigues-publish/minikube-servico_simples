@@ -94,7 +94,7 @@ teste_servico: teste_python
 #
 .PHONY : minikube
 minikube:
-	minikube start --driver="virtualbox" ;\ #--host-dns-resolver=true --dns-proxy=false;\
+	minikube start --driver="virtualbox" ;\
 	eval $$(minikube docker-env)
 
 .PHONY : imagem
