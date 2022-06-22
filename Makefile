@@ -35,11 +35,12 @@ install: venv
 	. venv/bin/activate ; \
 	pip install -r bin/servico1/requirements.txt
 
-.PHONY : lint
-lint: install
-	. venv/bin/activate ; \
-	pylint  --fail-under=$(lint_minimo) bin/servico1/ser1.py
-
+################################################################################
+# Testes
+################################################################################
+#
+# Testes unitários
+#
 .PHONY : teste_python
 teste_python: lint
 	. venv/bin/activate ; \
@@ -47,6 +48,17 @@ teste_python: lint
 	python -m unittest discover || exit 1 ; \
 	cd ..
 
+#
+# Análise estática de código
+#
+.PHONY : lint
+lint: install
+	. venv/bin/activate ; \
+	pylint  --fail-under=$(lint_minimo) bin/servico1/ser1.py
+
+#
+# Testes globais ( End to End Testing)
+#
 .PHONY : teste_servico
 teste_servico: teste_python
 	. venv/bin/activate ; \
