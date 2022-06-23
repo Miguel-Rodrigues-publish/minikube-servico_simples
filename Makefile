@@ -82,7 +82,13 @@ teste_python: lint
 # Análise estática de código
 #
 .PHONY : lint
-lint: install etc/configuracao_empresa/minimo_lint_python.txt  etc/configuracao_empresa/versao_python.txt etc/configuracao_empresa/nome_container.txt etc/configuracao_empresa/versao_base_container.txt etc/versao_servico.txt
+lint: install \
+	    etc/configuracao_empresa/minimo_lint_python.txt  \
+	    etc/configuracao_empresa/versao_python.txt \
+			etc/configuracao_empresa/nome_container.txt \
+			etc/configuracao_empresa/versao_base_container.txt \
+			etc/versao_servico.txt \
+			bin/servico1/ser1.py
 	. venv/bin/activate ; \
 	pylint  --fail-under=$(lint_minimo) bin/servico1/ser1.py
 
@@ -95,28 +101,27 @@ teste_servico: teste_python
 	PORTO=$(porto_teste_local) NOME=$(nome_servico) ./bin/servico1/teste.sh
 
 ################################################################################
-# Docker
+# Docker e minikube
 #		Estes passos só estrão disponíveis se o minikube estiver instalado
 ################################################################################
 
-#
-# minikube activo
-#
 .PHONY : minikube
 minikube:
 	minikube status ||  minikube start --driver="virtualbox" ;\
 	eval $$(minikube docker-env)
 
 .PHONY : minikube_imagem
-minikube_imagem: minikube
+minikube_imagem: minikube lint
 	cd ./bin/servico1;\
-	docker build \
-	  --build-arg VERSAO_PYTHON=$(versao_python) \
-	  --build-arg VERSAO_BASE_CONTAINER=$(versao_container_base) \
-	  --build-arg NOME_BASE_CONTAINER=$(nome_container_base) \
-		--tag $(nome_container_servico):$(versao_servico) \
-		--tag $(nome_container_servico):latest \
-		.
+	docker image inspect $(nome_container_servico):$(versao_servico) \
+	     --format="ignora resultado" || \
+			 docker build \
+			  --build-arg VERSAO_PYTHON=$(versao_python) \
+			  --build-arg VERSAO_BASE_CONTAINER=$(versao_container_base) \
+			  --build-arg NOME_BASE_CONTAINER=$(nome_container_base) \
+				--tag $(nome_container_servico):$(versao_servico) \
+				--tag $(nome_container_servico):latest \
+				.
 
 
 minikube_teste_imagem: minikube_imagem
