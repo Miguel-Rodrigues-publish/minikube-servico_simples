@@ -104,11 +104,11 @@ teste_servico: teste_python
 #
 .PHONY : minikube
 minikube:
-	minikube start --driver="virtualbox" ;\
+	minikube status ||  minikube start --driver="virtualbox" ;\
 	eval $$(minikube docker-env)
 
-.PHONY : imagem
-imagem: minikube
+.PHONY : minikube_imagem
+minikube_imagem: minikube
 	cd ./bin/servico1;\
 	docker build \
 	  --build-arg VERSAO_PYTHON=$(versao_python) \
@@ -119,7 +119,7 @@ imagem: minikube
 		.
 
 
-teste_imagem: imagem
+minikube_teste_imagem: minikube_imagem
 	eval $$(minikube docker-env) ;\
 	docker run \
 		--env PORTO=$(porto_teste_container) \
@@ -132,7 +132,3 @@ teste_imagem: imagem
 	curl localhost:$(porto_teste_local) ;\
 	echo $$CONTAINER ;\
 	docker stop $$CONTAINER
-
-
-
-# storage-provisioner, registry, default-storageclass
