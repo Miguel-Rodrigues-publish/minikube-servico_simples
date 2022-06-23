@@ -1,4 +1,6 @@
-
+#
+# Makefile simples só para automatizar as tarefas de desenvolvimento (não entra
+# em conta com as dependências )
 ################################################################################
 # Variaveis globais da Makefile
 ################################################################################
@@ -68,15 +70,6 @@ install: venv
 ################################################################################
 # Testes
 ################################################################################
-#
-# Testes unitários
-#
-.PHONY : teste_python
-teste_python: lint
-	. venv/bin/activate ; \
-	cd bin; \
-	python -m unittest discover || exit 1 ; \
-	cd ..
 
 #
 # Análise estática de código
@@ -91,6 +84,16 @@ lint: install \
 			bin/servico1/ser1.py
 	. venv/bin/activate ; \
 	pylint  --fail-under=$(lint_minimo) bin/servico1/ser1.py
+
+#
+# Testes unitários
+#
+.PHONY : teste_python
+teste_python: lint
+	. venv/bin/activate ; \
+	cd bin; \
+	python -m unittest discover || exit 1 ; \
+	cd ..
 
 #
 # Testes globais ( End to End Testing)
@@ -122,7 +125,6 @@ minikube_imagem: minikube lint
 				--tag $(nome_container_servico):$(versao_servico) \
 				--tag $(nome_container_servico):latest \
 				.
-
 
 minikube_teste_imagem: minikube_imagem
 	eval $$(minikube docker-env) ;\
