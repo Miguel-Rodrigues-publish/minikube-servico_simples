@@ -134,6 +134,5 @@ minikube_teste_imagem: minikube_imagem
 		$(nome_container_servico):$(versao_servico) ;\
 	CONTAINER=$$(docker ps -q --filter=ancestor=$(nome_container_servico):$(versao_servico)) ;\
 	sleep 5 ;\
-	curl localhost:$(porto_teste_local) ;\
-	echo $$CONTAINER ;\
+	minikube ssh curl localhost:$(porto_teste_local) ;\
 	docker stop $$CONTAINER
