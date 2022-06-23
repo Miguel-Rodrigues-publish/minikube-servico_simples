@@ -10,20 +10,30 @@
 lint_minimo      := $(shell cat etc/configuracao_empresa/minimo_lint_python.txt)
 # versao de python
 versao_python    := $(shell cat etc/configuracao_empresa/versao_python.txt)
-# versao do container
-versao_container := $(shell cat etc/configuracao_empresa/versao_base_container.txt)
-# nome do container
-nome_container   := $(shell cat etc/configuracao_empresa/nome_container.txt)
+# nome do containe inicial r
+nome_container_base   := $(shell cat etc/configuracao_empresa/nome_container.txt)
+# versao do container inicial
+versao_container_base := $(shell cat etc/configuracao_empresa/versao_base_container.txt)
 
 
 ################################################################################
 # Valores Globais (Projecto)
 ################################################################################
 # nome do container
-nome_servico = "servico1"
+nome_container_servico = servico1
 # versao para marcar o container
 #versao = "0.6"
-versao := $(shell cat etc/versao_servico.txt)
+versao_servico := $(shell cat etc/versao_servico.txt)
+# porto que o container usa
+porto_teste_container := 3000
+# porto para ligação no "portatil". Não pode estar a ser usado
+porto_teste_local := 8888
+# nome do servico
+nome_servico = nome_para_testar_servico1
+
+################################################################################
+#  Inicio Makefile
+################################################################################
 
 #
 # teste se python com a versao mínima está presente
@@ -72,7 +82,13 @@ teste_python: lint
 # Análise estática de código
 #
 .PHONY : lint
-lint: install
+lint: install \
+	    etc/configuracao_empresa/minimo_lint_python.txt  \
+	    etc/configuracao_empresa/versao_python.txt \
+			etc/configuracao_empresa/nome_container.txt \
+			etc/configuracao_empresa/versao_base_container.txt \
+			etc/versao_servico.txt \
+			bin/servico1/ser1.py
 	. venv/bin/activate ; \
 	pylint  --fail-under=$(lint_minimo) bin/servico1/ser1.py
 
@@ -82,27 +98,41 @@ lint: install
 .PHONY : teste_servico
 teste_servico: teste_python
 	. venv/bin/activate ; \
-	PORTO=9000 NOME=nome_para_testar_servico1 ./bin/servico1/teste.sh
+	PORTO=$(porto_teste_local) NOME=$(nome_servico) ./bin/servico1/teste.sh
 
 ################################################################################
-# Docker
+# Docker e minikube
 #		Estes passos só estrão disponíveis se o minikube estiver instalado
 ################################################################################
 
-#
-# minikube activo
-#
 .PHONY : minikube
 minikube:
-	minikube start --driver="virtualbox" ;\ #--host-dns-resolver=true --dns-proxy=false;\
+	minikube status ||  minikube start --driver="virtualbox" ;\
 	eval $$(minikube docker-env)
 
-.PHONY : imagem
-imagem: minikube
+.PHONY : minikube_imagem
+minikube_imagem: minikube lint
 	cd ./bin/servico1;\
-	docker build \
-	  --build-arg VERSAO_PYTHON=$(versao_python) \
-	  --build-arg VERSAO_BASE_CONTAINER=$(versao_container) \
-	  --build-arg NOME_BASE_CONTAINER=$(nome_container) \
-		--tag $(nome_servico):$(versao) \
-		.
+	docker image inspect $(nome_container_servico):$(versao_servico) \
+	     --format="ignora resultado" || \
+			 docker build \
+			  --build-arg VERSAO_PYTHON=$(versao_python) \
+			  --build-arg VERSAO_BASE_CONTAINER=$(versao_container_base) \
+			  --build-arg NOME_BASE_CONTAINER=$(nome_container_base) \
+				--tag $(nome_container_servico):$(versao_servico) \
+				--tag $(nome_container_servico):latest \
+				.
+
+
+minikube_teste_imagem: minikube_imagem
+	eval $$(minikube docker-env) ;\
+	docker run \
+		--env PORTO=$(porto_teste_container) \
+		--env NOME=$(nome_servico) \
+		--detach \
+		-p $(porto_teste_local):$(porto_teste_container) \
+		$(nome_container_servico):$(versao_servico) ;\
+	CONTAINER=$$(docker ps -q --filter=ancestor=$(nome_container_servico):$(versao_servico)) ;\
+	sleep 5 ;\
+	minikube ssh curl localhost:$(porto_teste_local) ;\
+	docker stop $$CONTAINER
